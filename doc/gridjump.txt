@@ -1,0 +1,220 @@
+*gridjump.txt*  Grid-based cursor jump plugin for Neovim
+
+==============================================================================
+CONTENTS                                                    *gridjump-contents*
+
+  1. Introduction .............. |gridjump-introduction|
+  2. Requirements .............. |gridjump-requirements|
+  3. Commands .................. |gridjump-commands|
+  4. Usage ..................... |gridjump-usage|
+  5. Configuration ............. |gridjump-configuration|
+  6. Options ................... |gridjump-options|
+  7. Highlight groups .......... |gridjump-highlights|
+  8. License ................... |gridjump-license|
+
+==============================================================================
+1. Introduction                                         *gridjump-introduction*
+
+gridjump.nvim lets you jump anywhere on the visible screen in two keystrokes.
+
+When you invoke |:GridJump|, the plugin overlays index characters on the
+current buffer:
+
+  • Row labels at the column positions defined by |gridjump-index_cols|.
+  • Column labels at the row positions defined by |gridjump-index_rows|.
+
+Press a row key, then a column key, and the cursor moves to that cell.
+
+Inspired by hop.nvim and jumpcursor.vim.
+
+==============================================================================
+2. Requirements                                         *gridjump-requirements*
+
+  • Neovim 0.9 or newer.
+
+==============================================================================
+3. Commands                                               *gridjump-commands*
+
+                                                                   *:GridJump*
+:GridJump
+    Activate the grid-jump overlay. See |gridjump-usage| for the interaction
+    flow.
+
+==============================================================================
+4. Usage                                                     *gridjump-usage*
+
+Phase 1 — Row selection ~
+
+  After `:GridJump` is invoked:
+
+  • Row-index characters are shown at every |gridjump-index_cols| column,
+    highlighted with `GridJumpHighlight`.
+  • Column-index characters are shown at every |gridjump-index_rows| row,
+    shown with the dimmer `GridJumpDim` group.
+
+  Press the character that corresponds to your target row.
+  Press <Esc> to cancel.
+
+Phase 2 — Column selection ~
+
+  • The selected row's label stays highlighted; all other row labels become dim.
+  • Column-index characters appear directly on the selected row, highlighted
+    with `GridJumpHighlight`, spanning only the actual content of that line.
+
+  Press the character that corresponds to your target column.
+  Press <Esc> to cancel.
+
+The cursor then moves to the chosen (row, column) position.
+
+Strides ~
+
+If |gridjump-row_stride| or |gridjump-col_stride| is greater than 1, only
+every N-th row / column receives a label.  Pressing the label character still
+jumps to the exact row/column position, not just the label's position.
+
+==============================================================================
+5. Configuration                                       *gridjump-configuration*
+
+Call `require("gridjump").setup(opts)` in your init file.  All fields are
+optional; omitted fields keep their defaults.
+
+Example: >lua
+  require("gridjump").setup({
+    index_rows  = { 1, -1 },
+    index_cols  = { 1 },
+    index_style = {
+      highlight = { fg = "#ff5555", bold = true },
+      dim       = "Comment",
+    },
+    index_chars = "qwertyuiopasdfghjklzxcvbnm",
+    row_stride  = 1,
+    col_stride  = 1,
+  })
+<
+
+==============================================================================
+6. Options                                                   *gridjump-options*
+
+------------------------------------------------------------------------------
+                                                          *gridjump-index_rows*
+index_rows                      list of integers  (default: `{ 1 }`)
+
+  Visible row numbers at which the column-index characters are rendered during
+  phase 1 (dim overlay).
+
+  Positive integers are counted from the top of the visible window (1 = first
+  visible line).  Negative integers count from the bottom (-1 = last visible
+  line, -2 = second-to-last, …).
+
+  Example — show on both the first and last visible rows: >lua
+    index_rows = { 1, -1 }
+<
+
+------------------------------------------------------------------------------
+                                                          *gridjump-index_cols*
+index_cols                      list of integers  (default: `{ 1 }`)
+
+  Visible column numbers at which the row-index characters are rendered.
+
+  Positive integers count from the left of the text area (after sign columns
+  and line-number columns).  Negative integers count from the right.
+
+  Example — show on the first and second-to-last columns: >lua
+    index_cols = { 1, -2 }
+<
+
+------------------------------------------------------------------------------
+                                                         *gridjump-index_style*
+index_style                     table  (default shown below)
+
+  Controls the appearance of overlay characters.  The table has two keys:
+
+  `highlight`
+      Applied to active index characters: row labels in phase 1, and all
+      labels on the selected row in phase 2.
+      Default: `"DiagnosticInfo"`
+
+  `dim`
+      Applied to inactive index characters.
+      Default: `"Comment"`
+
+  Each value can be:
+    • A string  → the name of an existing highlight group to link to.
+    • A table   → passed directly to |nvim_set_hl()|.
+                  Example: `{ fg = "#ff0000", bold = true }`
+
+  Example — fully custom colors: >lua
+    index_style = {
+      highlight = { fg = "#ffcc00", bold = true },
+      dim       = { fg = "#444444" },
+    }
+<
+  Example — link to existing groups: >lua
+    index_style = {
+      highlight = "WarningMsg",
+      dim       = "NonText",
+    }
+<
+
+------------------------------------------------------------------------------
+                                                         *gridjump-index_chars*
+index_chars                     string  (default: `""`)
+
+  Custom prefix for the index character sequence.  Characters listed here
+  appear first; any characters from the built-in default sequence that are not
+  already present are appended afterwards.
+
+  Built-in default sequence: >
+    abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+<
+  Example — QWERTY home row first: >lua
+    index_chars = "qwertyuiopasdfghjklzxcvbnm"
+<
+  Result sequence: >
+    qwertyuiopasdfghjklzxcvbnmABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789
+<
+  (lowercase letters already exhausted by the prefix; uppercase and digits
+  are appended from the default)
+
+------------------------------------------------------------------------------
+                                                          *gridjump-row_stride*
+row_stride                      integer  (default: `1`)
+
+  Assign an index label to every N-th visible row.  With `row_stride = 1`
+  every row gets a label.  With `row_stride = 3` labels are placed on rows
+  1, 4, 7, …, and pressing the label jumps to exactly that row.
+
+------------------------------------------------------------------------------
+                                                          *gridjump-col_stride*
+col_stride                      integer  (default: `1`)
+
+  Same as |gridjump-row_stride| but for columns.
+
+==============================================================================
+7. Highlight groups                                       *gridjump-highlights*
+
+gridjump.nvim defines two highlight groups that you can override in your
+colorscheme or init file.
+
+*GridJumpHighlight*
+    Used for active (highlighted) index characters.
+    Default: links to `DiagnosticInfo` (typically cyan/blue).
+
+*GridJumpDim*
+    Used for inactive (dimmed) index characters.
+    Default: links to `Comment` (typically grey).
+
+Override example: >lua
+  vim.api.nvim_set_hl(0, "GridJumpHighlight", { fg = "#ff5555", bold = true })
+  vim.api.nvim_set_hl(0, "GridJumpDim",       { fg = "#555555" })
+<
+Note: calling `setup()` with |gridjump-index_style| redefines these groups
+on each invocation, so set them after `setup()` if you override manually.
+
+==============================================================================
+8. License                                                   *gridjump-license*
+
+MIT License. See the LICENSE file distributed with this plugin.
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
