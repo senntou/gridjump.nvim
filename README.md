@@ -2,32 +2,15 @@
 
 A fast grid-based cursor jump plugin for Neovim, inspired by [hop.nvim](https://github.com/phaazon/hop.nvim) and [jumpcursor.vim](https://github.com/skanehira/jumpcursor.vim).
 
+## Demo
+
+<!-- demo gif here -->
+
 ## How it works
 
-Invoke `:GridJump` and the visible buffer is overlaid with index characters:
+Invoke `:GridJump`, press a **row key**, then a **column key** — the cursor jumps to that cell in two keystrokes.
 
-- **Columns** on the configured index rows (dim, waiting for row selection)
-- **Rows** on the configured index columns (highlighted, prompt for row key)
-
-Press a **row key** → that row is highlighted, column indices appear on it.  
-Press a **column key** → cursor jumps to the intersection.
-
-Press `<Esc>` at any point to cancel.
-
-```
-Before pressing anything:
-  a │ some text here         ← row 'a' shown at index_cols position
-  b │ another line           ← row 'b'
-  c │ third line             ← row 'c'
-    └─a──b──c──d──e──        ← col chars shown at index_rows position (dim)
-
-After pressing 'b' (row selected):
-  a │ (dim)
-  b │ a b c d e f g h ...   ← col chars highlighted on the selected row
-  c │ (dim)
-
-Press 'c' → jumps to row b, column c
-```
+Because each position always maps to the same key, the layout is fully deterministic. The more you use it, the more the mappings become muscle memory, making cursor movement progressively faster.
 
 ## Requirements
 
@@ -37,12 +20,41 @@ Press 'c' → jumps to row b, column c
 
 ### [lazy.nvim](https://github.com/folke/lazy.nvim)
 
+Minimal setup:
+
 ```lua
 {
-  "your-username/gridjump.nvim",
+  "senntou/gridjump.nvim",
   config = function()
     require("gridjump").setup()
   end,
+}
+```
+
+Full example with custom settings and a keybinding:
+
+```lua
+{
+  "senntou/gridjump.nvim",
+  config = function()
+    require("gridjump").setup({
+      -- Show index rows at lines 1, 11, 21, 31
+      index_rows = { 1, 11, 21, 31 },
+      -- Show index cols at columns 1, 21, 41, 61
+      index_cols = { 1, 21, 41, 61 },
+      index_style = {
+        highlight = { fg = "#00ffff", bold = true },
+        dim       = { fg = "#555555" },
+      },
+      -- QWERTY-based character order
+      index_chars = "qwertyuiopasdfghjkl;zxcvbnm,./",
+      row_stride = 1,
+      col_stride = 2,
+    })
+  end,
+  keys = {
+    { "<leader>g", "<cmd>GridJump<cr>", desc = "Grid Jump" },
+  },
 }
 ```
 
@@ -50,7 +62,7 @@ Press 'c' → jumps to row b, column c
 
 ```lua
 use {
-  "your-username/gridjump.nvim",
+  "senntou/gridjump.nvim",
   config = function()
     require("gridjump").setup()
   end,
