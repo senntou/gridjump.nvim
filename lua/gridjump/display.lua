@@ -82,9 +82,14 @@ local function render(bufnr, view, config, chars_str, selected_row_i)
   local selected_lnum_0, selected_max_col_i
   if selected_row_i ~= nil then
     selected_lnum_0 = view.first_line + selected_row_i - 2
-    local line = vim.api.nvim_buf_get_lines(bufnr, selected_lnum_0, selected_lnum_0 + 1, false)[1] or ""
-    local line_dw = vim.fn.strdisplaywidth(line)
-    selected_max_col_i = math.max(0, line_dw - view.leftcol)
+    if config.free_jump then
+      -- Show col indices across the full window width regardless of text
+      selected_max_col_i = n_cols
+    else
+      local line = vim.api.nvim_buf_get_lines(bufnr, selected_lnum_0, selected_lnum_0 + 1, false)[1] or ""
+      local line_dw = vim.fn.strdisplaywidth(line)
+      selected_max_col_i = math.max(0, line_dw - view.leftcol)
+    end
   end
 
   -- Phase 2: win_cols on selected_lnum_0 that will carry a col index char.

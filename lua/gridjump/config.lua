@@ -14,6 +14,8 @@ M.defaults = {
   row_stride = 1,          -- assign index every N visible rows
   col_stride = 1,          -- assign index every N visible columns
   fill_stride_gaps = false, -- fill non-indexed positions with spaces to hide buffer text
+  free_jump = false,        -- when true, jump to nearest text using distance_fn
+  distance_fn = nil,        -- function(r1,c1,r2,c2)->number; nil = Manhattan distance
 }
 
 function M.merge(user_config)

@@ -1,4 +1,4 @@
-*gridjump.txt*  Grid-based cursor jump plugin for Neovim
+*gridjump.txt*  *gridjump*  Grid-based cursor jump plugin for Neovim
 
 ==============================================================================
 CONTENTS                                                    *gridjump-contents*
@@ -204,6 +204,48 @@ fill_stride_gaps                boolean  (default: `false`)
 
   Example: >lua
     fill_stride_gaps = true
+<
+
+------------------------------------------------------------------------------
+                                                          *gridjump-free_jump*
+free_jump                       boolean  (default: `false`)
+
+  When `false` (the default), the cursor moves to exactly the grid cell you
+  selected — which may be on an empty line or past the end of a line.
+
+  When `true`, gridjump instead finds the nearest text character to the
+  selected grid position and moves the cursor there.  "Nearest" is measured
+  by |gridjump-distance_fn|.  This is useful when you are jumping toward a
+  general area of the screen rather than a precise cell, and you want the
+  cursor to land on actual text.
+
+  Example: >lua
+    free_jump = true
+<
+
+------------------------------------------------------------------------------
+                                                       *gridjump-distance_fn*
+distance_fn                     function or nil  (default: `nil`)
+
+  A custom distance function used when |gridjump-free_jump| is `true`.
+  It receives four numbers `(r1, c1, r2, c2)` — the row and column of the
+  target grid cell, and the row and column of a candidate text position
+  (both 1-indexed within the visible window) — and must return a number.
+  The candidate with the smallest return value wins.
+
+  When `nil`, the Manhattan distance is used: >
+    |r1 - r2| + |c1 - c2|
+<
+  Example — prefer vertical proximity over horizontal: >lua
+    distance_fn = function(r1, c1, r2, c2)
+      return math.abs(r1 - r2) * 2 + math.abs(c1 - c2)
+    end
+<
+  Example — Euclidean distance: >lua
+    distance_fn = function(r1, c1, r2, c2)
+      local dr, dc = r1 - r2, c1 - c2
+      return math.sqrt(dr * dr + dc * dc)
+    end
 <
 
 ==============================================================================
