@@ -190,6 +190,22 @@ col_stride                      integer  (default: `1`)
 
   Same as |gridjump-row_stride| but for columns.
 
+------------------------------------------------------------------------------
+                                                   *gridjump-fill_stride_gaps*
+fill_stride_gaps                boolean  (default: `false`)
+
+  When `row_stride` or `col_stride` is greater than 1, rows and columns
+  between labelled positions are left unlabelled.  By default, the original
+  buffer text shows through at those overlay positions, which can look noisy.
+
+  Set this to `true` to replace the unlabelled overlay positions with blank
+  spaces, hiding the underlying text and making the index characters stand out
+  more clearly.
+
+  Example: >lua
+    fill_stride_gaps = true
+<
+
 ==============================================================================
 7. Highlight groups                                       *gridjump-highlights*
 

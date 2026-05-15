@@ -11,8 +11,9 @@ M.defaults = {
     dim       = "Comment",        -- inactive indices
   },
   index_chars = "",
-  row_stride = 1, -- assign index every N visible rows
-  col_stride = 1, -- assign index every N visible columns
+  row_stride = 1,          -- assign index every N visible rows
+  col_stride = 1,          -- assign index every N visible columns
+  fill_stride_gaps = false, -- fill non-indexed positions with spaces to hide buffer text
 }
 
 function M.merge(user_config)
