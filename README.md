@@ -3,8 +3,7 @@
 A fast grid-based cursor jump plugin for Neovim, inspired by [hop.nvim](https://github.com/phaazon/hop.nvim) and [jumpcursor.vim](https://github.com/skanehira/jumpcursor.vim).
 
 ## Demo
-
-<!-- demo gif here -->
+<img width="1920" height="844" alt="scsho" src="https://github.com/user-attachments/assets/2358b991-1944-4310-910c-115d0da5ad6d" />
 
 ## How it works
 
